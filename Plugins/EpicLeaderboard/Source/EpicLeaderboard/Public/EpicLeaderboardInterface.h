@@ -148,6 +148,15 @@ enum Timeframe : uint8
 	Day = 4 UMETA(DisplayName = "Day")
 };
 
+UENUM(BlueprintType)
+enum IsUsernameAvailableResponse : uint8
+{
+	Available = 0 UMETA(DisplayName = "Available"),
+	Invalid = 1 UMETA(DisplayName = "Invalid"),
+	Profanity = 2 UMETA(DisplayName = "Profanity"),
+	Taken = 3 UMETA(DisplayName = "Taken")
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEpicLeaderboardGetEntriesEvent, FEpicLeaderboardGetEntriesResponse,
                                             Entries);
 
@@ -244,8 +253,8 @@ protected:
 
 		FString data = Response->GetContentAsString();
 
-		FString time = Response->GetHeader("X-Response-Time");
-		UE_LOG(LogTemp, Warning, TEXT("GetLeaderboardEntries Response Time: %s"), *time);
+		//FString time = Response->GetHeader("X-Response-Time");
+		//UE_LOG(LogTemp, Warning, TEXT("GetLeaderboardEntries Response Time: %s"), *time);
 
 		FEpicLeaderboardGetEntriesResponse ResponseData;
 		
@@ -404,8 +413,8 @@ protected:
 			return;
 		}
 
-		FString time = Response->GetHeader("X-Response-Time");
-		UE_LOG(LogTemp, Warning, TEXT("SubmitLeaderboardEntry Response Time: %s"), *time);
+		//FString time = Response->GetHeader("X-Response-Time");
+		//UE_LOG(LogTemp, Warning, TEXT("SubmitLeaderboardEntry Response Time: %s"), *time);
 		
 		if(Response->GetResponseCode() == 200)
 		{
@@ -417,7 +426,7 @@ protected:
 };
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEpicLeaderboardIsUsernameAvailableEvent, bool, Available);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEpicLeaderboardIsUsernameAvailableEvent, IsUsernameAvailableResponse, Result);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEpicLeaderboardIsUsernameAvailableErrorEvent);
 
 UCLASS()
@@ -457,7 +466,7 @@ protected:
 		this->AddToRoot();
 		
 		// Base URL of the API endpoint
-		FString BaseURL = FString(TEXT(SERVER_URL)) + FString(TEXT("/api/isUsernameAvailable"));
+		FString BaseURL = FString(TEXT(SERVER_URL)) + FString(TEXT("/api/isUsernameAvailable_v2"));
 
 		// List of query parameters
 		TMap<FString, FString> QueryParams;
@@ -491,12 +500,28 @@ protected:
 			Error.Broadcast();
 			return;
 		}
+
+		//FString time = Response->GetHeader("X-Response-Time");
+		//UE_LOG(LogTemp, Warning, TEXT("UIsUsernameAvailable Response Time: %s"), *time);
 		
 		FString data = Response->GetContentAsString();
+
+		//convert string to enum
+		IsUsernameAvailableResponse Result = IsUsernameAvailableResponse::Invalid;
 		
-		FString time = Response->GetHeader("X-Response-Time");
-		UE_LOG(LogTemp, Warning, TEXT("UIsUsernameAvailable Response Time: %s"), *time);
+		if(data == "0")
+		{
+			Result = IsUsernameAvailableResponse::Available;
+		}
+		else if(data == "2")
+		{
+			Result = IsUsernameAvailableResponse::Profanity;
+		}
+		else if(data == "3")
+		{
+			Result = IsUsernameAvailableResponse::Taken;
+		}
 		
-		Success.Broadcast(data == "true");
+		Success.Broadcast(Result);
 	}
 };
