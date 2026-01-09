@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 
 /**
- * 
+ *
  */
-class EPICLDBTEMPLATE_API CompilerHelper
-{
+class EPICLDBTEMPLATE_API CompilerHelper {
 public:
-	CompilerHelper();
-	~CompilerHelper();
+  CompilerHelper();
+  ~CompilerHelper();
 };

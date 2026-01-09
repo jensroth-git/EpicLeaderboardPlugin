@@ -3,4 +3,5 @@
 #include "EpicLdbTemplate.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, EpicLdbTemplate, "EpicLdbTemplate" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, EpicLdbTemplate,
+                              "EpicLdbTemplate");
