@@ -69,59 +69,66 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct EPICLEADERBOARD_API FEpicLeaderboardGame {
-  GENERATED_BODY()
+struct EPICLEADERBOARD_API FEpicLeaderboardGame
+{
+	GENERATED_BODY()
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString GameID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString GameID = "";
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString GameKey;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString GameKey = "";
 };
 
 USTRUCT(BlueprintType)
-struct EPICLEADERBOARD_API FEpicLeaderboard {
-  GENERATED_BODY()
+struct EPICLEADERBOARD_API FEpicLeaderboard
+{
+	GENERATED_BODY()
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString PrimaryID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString PrimaryID = "";
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString SecondaryID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SecondaryID = "";
 };
 
 USTRUCT(BlueprintType)
-struct EPICLEADERBOARD_API FEpicLeaderboardEntry {
-  GENERATED_BODY()
+struct EPICLEADERBOARD_API FEpicLeaderboardEntry
+{
+	GENERATED_BODY()
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  int32 Rank;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Rank = 0;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString Username;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Username = "";
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString Score;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Score = "";
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FString Country;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Country = "";
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  TMap<FString, FString> Metadata;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FString, FString> Metadata = TMap<FString, FString>();
 
-  UPROPERTY()
-  FString Meta;
+	UPROPERTY()
+	FString Meta = "";
 };
 
 USTRUCT(BlueprintType)
-struct EPICLEADERBOARD_API FEpicLeaderboardGetEntriesResponse {
-  GENERATED_BODY()
+struct EPICLEADERBOARD_API FEpicLeaderboardGetEntriesResponse
+{
+	GENERATED_BODY()
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  TArray<FEpicLeaderboardEntry> Entries;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FEpicLeaderboardEntry> Entries = TArray<FEpicLeaderboardEntry>();
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
-  FEpicLeaderboardEntry PlayerEntry;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FEpicLeaderboardEntry PlayerEntry = FEpicLeaderboardEntry();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalEntries = 0;
 };
 
 UENUM(BlueprintType)
@@ -295,6 +302,16 @@ protected:
                                                    PlayerEntry.Metadata);
         }
       }
+
+			// parse total entries
+			TSharedPtr<FJsonValue> *totalEntries =
+			    JsonParsed->AsObject()->Values.Find(TEXT("totalEntries"));
+
+			if (totalEntries != nullptr && totalEntries->IsValid()) {
+				int32 Total = static_cast<int32>(totalEntries->Get()->AsNumber());
+
+				ResponseData.TotalEntries = Total;
+			}
 
       ResponseData.PlayerEntry = PlayerEntry;
     }
